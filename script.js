@@ -1,7 +1,10 @@
-// 🚨 CRITICAL SETUP: Paste your credentials from Supabase API tab here!
+// --- DATABASE INITIALIZATION ---
+// Paste your exact Supabase credentials inside the quotes below
 const SUPABASE_URL = "https://jypzclhjorqfddwjspiw.supabase.co/rest/v1/"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5cHpjbGhqb3JxZmRkd2pzcGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzYzOTUsImV4cCI6MjA5Nzg1MjM5NX0.MxC1e7ReQjG3ms3CCTPHBb3jONTUZyoSnRtHhFD3tyQ";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Using 'db' instead of 'supabase' to prevent the declaration conflict error
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- GLOBAL GAME VARIABLES ---
 let playerCoins = 50;
@@ -46,8 +49,12 @@ document.getElementById('save-username-btn').addEventListener('click', async () 
     localStorage.setItem('fridge_tycoon_username', playerUsername);
     document.getElementById('username-modal').style.display = 'none';
     
-    // Register player record in the database structure
-    await supabase.from('leaderboard').insert([{ username: playerUsername, high_score: playerCoins }]);
+    // Register player record in the database using the updated 'db' reference
+    try {
+        await db.from('leaderboard').insert([{ username: playerUsername, high_score: playerCoins }]);
+    } catch (err) {
+        console.error("Error creating profile:", err);
+    }
     fetchLeaderboard();
 });
 
@@ -111,7 +118,7 @@ function purchaseFridgeUpgrade() {
         const newConfig = fridgeTiers[currentFridgeTier];
         document.getElementById('fridge-name').textContent = newConfig.name;
         document.getElementById('tier-number').textContent = currentFridgeTier;
-        fridge.setAttribute('data-tier', currentFridgeTier); // Updates CSS custom state color profile
+        fridge.setAttribute('data-tier', currentFridgeTier); 
         
         const upgradeBtn = document.getElementById('upgrade-btn');
         if (newConfig.upgradeCost === null) {
@@ -144,15 +151,17 @@ async function updateUI() {
     document.getElementById('price-milk').textContent = `$${marketPrices.milk}`;
     document.getElementById('price-caviar').textContent = `$${marketPrices.caviar}`;
     
-    // Background cloud database sync
+    // Background cloud database sync updated to use 'db'
     if (playerUsername) {
-        await supabase.from('leaderboard').update({ high_score: playerCoins }).eq('username', playerUsername);
+        await db.from('leaderboard').update({ high_score: playerCoins }).eq('username', playerUsername);
     }
 }
 
 async function fetchLeaderboard() {
-    const { data, error } = await supabase.from('leaderboard').select('username, high_score').order('high_score', { ascending: false }).limit(5);
+    // Fetches top records from Supabase cleanly using 'db'
+    const { data, error } = await db.from('leaderboard').select('username, high_score').order('high_score', { ascending: false }).limit(5);
     if (error) return;
+    
     const listElement = document.getElementById('leaderboard-list');
     listElement.innerHTML = "";
     data.forEach((p, i) => {
@@ -160,4 +169,5 @@ async function fetchLeaderboard() {
         listElement.innerHTML += `<li><span>${prefix}${p.username}</span><strong>$${p.high_score}</strong></li>`;
     });
 }
-setInterval(fetchLeaderboard, 20000); // Pull scores loop
+
+setInterval(fetchLeaderboard, 20000); // Live sync pull window every 20 seconds
