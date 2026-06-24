@@ -57,7 +57,8 @@ document.getElementById('save-username-btn').addEventListener('click', async () 
         console.error("Database connection registration error:", err);
     }
     
-    fetchLeaderboard();
+    // Wait half a second for Supabase to write the data, then pull the fresh leaderboard
+    setTimeout(fetchLeaderboard, 500); 
 });
 
 // --- CORE INTERACTION ENGINE ---
@@ -181,4 +182,5 @@ async function fetchLeaderboard() {
     }
 }
 
-setInterval(fetchLeaderboard, 20000);
+// Change from 20000 to 10000 for faster background updates
+setInterval(fetchLeaderboard, 10000);
