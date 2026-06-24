@@ -3,18 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fridge Market Tycoon</title>
+    <title>Fridge Market Tycoon Pro</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+    <div id="username-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Enter Your Tycoon Tag</h2>
+            <p>This name will be displayed on the global leaderboard.</p>
+            <input type="text" id="username-input" placeholder="e.g., LeftoverKing99" maxlength="15">
+            <button id="save-username-btn">Enter Market</button>
+        </div>
+    </div>
 
     <div class="game-container">
         
         <div class="panel fridge-panel">
+            <div class="tier-badge">TIER <span id="tier-number">1</span></div>
             <h2 id="fridge-name">Rusty Mini-Fridge</h2>
-            <p>Click fridge to look inside (Costs $2)</p>
+            <p class="cost-indicator">Cost per peek: $2</p>
             
-            <div class="fridge" id="myFridge">
+            <div class="fridge" id="myFridge" data-tier="1">
                 <div class="fridge-inside">
                     <span id="food-item">❓</span>
                 </div>
@@ -22,44 +33,51 @@
                     <div class="handle"></div>
                 </div>
             </div>
-            <p id="game-status">Ready to open...</p>
+            <p id="game-status">Connecting to network...</p>
         </div>
 
         <div class="panel dashboard-panel">
-            <h2>Dashboard</h2>
+            <h2>DASHBOARD</h2>
             <div class="wallet-box">
                 <span id="wallet">Balance: $50</span>
             </div>
             
-            <h3>Your Inventory</h3>
+            <h3>Your Cargo Space</h3>
             <ul class="inventory-list">
-                <li>🍕 Pizza: <span id="inv-pizza">0</span></li>
-                <li>🥛 Milk: <span id="inv-milk">0</span></li>
-                <li>👑 Caviar: <span id="inv-caviar">0</span></li>
+                <li><span>🍕 Pizza Slice</span> <span class="badge" id="inv-pizza">0</span></li>
+                <li><span>🥛 Fresh Milk</span> <span class="badge" id="inv-milk">0</span></li>
+                <li><span>👑 Black Caviar</span> <span class="badge" id="inv-caviar">0</span></li>
             </ul>
         </div>
 
         <div class="panel market-panel">
-            <h2>Live Food Market</h2>
-            <p class="ticker-note">Prices change every 7 seconds!</p>
+            <h2>LIVE MARKET</h2>
+            <p class="ticker-note">⚡ Volatility Engine Active: Prices change every 7s</p>
             
             <div class="market-item">
-                <span>🍕 Pizza Price: <strong id="price-pizza">$10</strong></span>
-                <button onclick="sellItem('pizza')">Sell 1</button>
+                <span>🍕 Pizza: <strong id="price-pizza" class="text-green">$10</strong></span>
+                <button class="btn-sell" onclick="sellItem('pizza')">SELL</button>
             </div>
             <div class="market-item">
-                <span>🥛 Milk Price: <strong id="price-milk">$5</strong></span>
-                <button onclick="sellItem('milk')">Sell 1</button>
+                <span>🥛 Milk: <strong id="price-milk" class="text-green">$5</strong></span>
+                <button class="btn-sell" onclick="sellItem('milk')">SELL</button>
             </div>
             <div class="market-item">
-                <span>👑 Caviar Price: <strong id="price-caviar">$100</strong></span>
-                <button onclick="sellItem('caviar')">Sell 1</button>
+                <span>👑 Caviar: <strong id="price-caviar" class="text-green">$100</strong></span>
+                <button class="btn-sell" onclick="sellItem('caviar')">SELL</button>
             </div>
 
-            <hr>
+            <div class="leaderboard-box">
+                <h3>🏆 GLOBAL LEADERBOARD</h3>
+                <ol id="leaderboard-list">
+                    <li>Syncing leaderboard records...</li>
+                </ol>
+            </div>
 
-            <h2>Upgrade Shop</h2>
-            <button id="upgrade-btn" onclick="purchaseFridgeUpgrade()">Upgrade Fridge ($200)</button>
+            <hr class="neon-divider">
+
+            <h2>UPGRADES</h2>
+            <button id="upgrade-btn" class="btn-upgrade" onclick="purchaseFridgeUpgrade()">Buy Tier 2 Smart Fridge ($150)</button>
         </div>
 
     </div>
