@@ -134,11 +134,12 @@
             transform: rotateY(-115deg); 
         }
         
-        .fridge.open::before { 
-            transform: rotateY(-115deg) translateZ(10px) translateX(28px); 
-            opacity: 0; 
-            pointer-events: none;
-        }
+        /* --- CALIBRATED HANDLE SWING ANIMATION --- */
+.fridge.open::before { 
+    transform: rotateY(-115deg) translateZ(1px) translateX(190px);
+    opacity: 0;
+    pointer-events: none;
+}
 
         .status-box {
             background: #0f172a;
