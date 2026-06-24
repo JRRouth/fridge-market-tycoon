@@ -1,9 +1,8 @@
 // --- DATABASE INITIALIZATION ---
-// Paste your exact Supabase credentials inside the quotes below
-const SUPABASE_URL = "https://jypzclhjorqfddwjspiw.supabase.co/rest/v1/"; 
+// FIXED: Cleaned URL string (removed '/rest/v1/') so the SDK maps endpoint paths accurately
+const SUPABASE_URL = "https://jypzclhjorqfddwjspiw.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5cHpjbGhqb3JxZmRkd2pzcGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzYzOTUsImV4cCI6MjA5Nzg1MjM5NX0.MxC1e7ReQjG3ms3CCTPHBb3jONTUZyoSnRtHhFD3tyQ";
 
-// Using 'db' instead of 'supabase' to prevent the declaration conflict error
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- GLOBAL GAME VARIABLES ---
@@ -35,6 +34,8 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('username-modal').style.display = 'none';
         gameStatus.textContent = `Welcome back, ${playerUsername}!`;
         fetchLeaderboard();
+    } else {
+        gameStatus.textContent = "Awaiting credentials identification access...";
     }
 });
 
@@ -47,14 +48,17 @@ document.getElementById('save-username-btn').addEventListener('click', async () 
     
     playerUsername = nameInput;
     localStorage.setItem('fridge_tycoon_username', playerUsername);
-    document.getElementById('username-modal').style.display = 'none';
     
-    // Register player record in the database using the updated 'db' reference
+    // SAFETY TRICK: Hide the modal first so game loops don't freeze if database response lags
+    document.getElementById('username-modal').style.display = 'none';
+    gameStatus.textContent = `Welcome, ${playerUsername}! Initializing market scanner...`;
+    
     try {
         await db.from('leaderboard').insert([{ username: playerUsername, high_score: playerCoins }]);
     } catch (err) {
-        console.error("Error creating profile:", err);
+        console.error("Database connection registration error:", err);
     }
+    
     fetchLeaderboard();
 });
 
@@ -151,23 +155,30 @@ async function updateUI() {
     document.getElementById('price-milk').textContent = `$${marketPrices.milk}`;
     document.getElementById('price-caviar').textContent = `$${marketPrices.caviar}`;
     
-    // Background cloud database sync updated to use 'db'
     if (playerUsername) {
-        await db.from('leaderboard').update({ high_score: playerCoins }).eq('username', playerUsername);
+        try {
+            await db.from('leaderboard').update({ high_score: playerCoins }).eq('username', playerUsername);
+        } catch (e) {
+            console.warn("Background score update skipped structural frames:", e);
+        }
     }
 }
 
 async function fetchLeaderboard() {
-    // Fetches top records from Supabase cleanly using 'db'
-    const { data, error } = await db.from('leaderboard').select('username, high_score').order('high_score', { ascending: false }).limit(5);
-    if (error) return;
-    
-    const listElement = document.getElementById('leaderboard-list');
-    listElement.innerHTML = "";
-    data.forEach((p, i) => {
-        let prefix = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : "";
-        listElement.innerHTML += `<li><span>${prefix}${p.username}</span><strong>$${p.high_score}</strong></li>`;
-    });
+    try {
+        const { data, error } = await db.from('leaderboard').select('username, high_score').order('high_score', { ascending: false }).limit(5);
+        if (error || !data) return;
+        
+        const listElement = document.getElementById('leaderboard-list');
+        listElement.innerHTML = "";
+        
+        data.forEach((p, i) => {
+            let prefix = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : "";
+            listElement.innerHTML += `<li><span>${prefix}${p.username}</span><strong>$${p.high_score}</strong></li>`;
+        });
+    } catch (err) {
+        console.error("Leaderboard engine connection dropped:", err);
+    }
 }
 
-setInterval(fetchLeaderboard, 20000); // Live sync pull window every 20 seconds
+setInterval(fetchLeaderboard, 20000);
