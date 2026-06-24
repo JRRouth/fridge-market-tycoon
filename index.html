@@ -193,7 +193,40 @@
         }
         .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5); }
 
-        .leaderboard-box { background: #111827; padding: 15px; border-radius: 10px; border: 1px solid #243557; margin: 20px 0 10px 0; }
+        /* --- INTERACTIVE LEADERBOARD STYLING TWEAKS --- */
+        .leaderboard-box { 
+            background: #111827; 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid #243557; 
+            margin: 20px 0 10px 0; 
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .leaderboard-box:hover {
+            transform: scale(1.02);
+            border-color: #3b82f6;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        }
+        .leaderboard-box:active {
+            transform: scale(0.99);
+        }
+        .leaderboard-box h3 {
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .leaderboard-box h3::after {
+            content: '↗';
+            font-size: 0.95rem;
+            color: #64748b;
+            transition: color 0.2s ease;
+        }
+        .leaderboard-box:hover h3::after {
+            color: #3b82f6;
+        }
+
         #leaderboard-list { text-align: left; padding-left: 20px; margin: 10px 0 0 0; color: #94a3b8; }
         #leaderboard-list li { padding: 4px 0; font-size: 0.95rem; display: flex; justify-content: space-between; }
         .neon-divider { border: 0; height: 1px; background: linear-gradient(90deg, transparent, #243557, transparent); margin: 20px 0; }
@@ -295,7 +328,7 @@
                 <button class="btn-sell" onclick="sellItem('caviar')">SELL</button>
             </div>
 
-            <div class="leaderboard-box">
+            <div class="leaderboard-box" onclick="window.location.href='./leaderboard.html'">
                 <h3>🏆 GLOBAL LEADERBOARD</h3>
                 <ol id="leaderboard-list">
                     <li>Connecting data pipeline rows...</li>
@@ -395,6 +428,7 @@
 
         fridge.addEventListener('click', function() {
             if (fridge.classList.contains('open')) {
+                fridge.classList.remove('remove');
                 fridge.classList.remove('open');
                 gameStatus.textContent = "Fridge closed. Scanner idle.";
                 setTimeout(() => { foodDisplay.textContent = "❓"; }, 500);
