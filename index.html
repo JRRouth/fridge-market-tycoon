@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fridge Market Tycoon Pro</title>
-    
     <link rel="manifest" href="manifest.json">
 
     <style>
@@ -70,76 +69,90 @@
 
         .cost-indicator { color: #64748b; font-size: 0.85rem; margin-top: -5px; }
 
-        /* --- THE CORE FRIDGE FRAME & BASE INSIDE --- */
+        /* --- REDESIGNED 3D FRIDGE WRAPPER --- */
         .fridge {
             position: relative;
             width: 220px;
-            height: 320px;
-            background: #1e293b;
+            height: 340px;
             margin: 30px auto;
-            border-radius: 12px;
-            border: 4px solid #0f172a;
+            perspective: 1200px; /* Enhanced 3D depth perception */
             cursor: pointer;
-            perspective: 1000px;
         }
 
+        /* --- THE COMPARTMENT (INSIDE THE FRIDGE) --- */
         .fridge-inside {
             position: absolute;
-            width: 100%; height: 100%;
-            background: #020617;
-            border-radius: 6px;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #090d16;
+            border-radius: 12px;
+            border: 4px solid #1e293b;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-around;
             align-items: center;
-            font-size: 4rem;
-            box-shadow: inset 0 0 30px rgba(99, 102, 241, 0.3);
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(99, 102, 241, 0.2);
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
-        /* --- THE DOOR (FRONT LAYER) --- */
-        .fridge::after {
-            content: '';
+        /* Neon cooling grid lines inside fridge */
+        .fridge-inside::before {
+            content: ''; position: absolute; width: 85%; height: 2px; background: rgba(59, 130, 246, 0.2); top: 33%; box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+        .fridge-inside::after {
+            content: ''; position: absolute; width: 85%; height: 2px; background: rgba(59, 130, 246, 0.2); top: 66%; box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+
+        .loot-drop-zone {
+            font-size: 4.5rem;
+            z-index: 2;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* --- THE BRAND NEW REAL DOOR COMPONENT --- */
+        .fridge-door {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 6px;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, border-color 0.3s ease;
-            transform-origin: left;
-            z-index: 5;
-            box-sizing: border-box;
-        }
-
-        /* --- DYNAMIC TIER DOOR COLORS --- */
-        .fridge[data-tier="1"]::after { background: #475569; border: 3px solid #64748b; box-shadow: inset 0 0 15px rgba(0,0,0,0.3); }
-        .fridge[data-tier="2"]::after { background: #1e3a8a; border: 3px solid #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-        .fridge[data-tier="3"]::after { background: #78350f; border: 3px solid #b45309; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
-        .fridge[data-tier="4"]::after { background: #4c1d95; border: 3px solid #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
-        .fridge[data-tier="5"]::after { background: #991b1b; border: 3px solid #ef4444; box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
-        .fridge[data-tier="6"]::after { background: #030712; border: 3px solid #ec4899; box-shadow: 0 0 35px rgba(236, 72, 153, 0.7); }
-
-        /* --- THE HANDLE --- */
-        .fridge::before {
-            content: '';
-            position: absolute;
-            top: 40%; right: 15px;
-            width: 12px; height: 50px;
-            background: #cbd5e1;
-            border-radius: 4px;
+            border-radius: 12px;
+            transform-origin: left center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-            transform-origin: left;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Places handle perfectly on the right side */
+            padding-right: 18px;
         }
 
-        /* --- STABLE SWINGING ANIMATION PATHS --- */
-        .fridge.open::after { 
-            transform: rotateY(-115deg); 
+        /* --- SOLID TIERS WITH INNER GLOW SHADING --- */
+        .fridge[data-tier="1"] .fridge-door { background: #475569; border: 4px solid #64748b; box-shadow: inset -10px 0 20px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.3); }
+        .fridge[data-tier="2"] .fridge-door { background: #1e3a8a; border: 4px solid #3b82f6; box-shadow: inset -10px 0 20px rgba(0,0,0,0.4), 0 0 15px rgba(59, 130, 246, 0.4); }
+        .fridge[data-tier="3"] .fridge-door { background: #78350f; border: 4px solid #b45309; box-shadow: inset -10px 0 20px rgba(0,0,0,0.4), 0 0 15px rgba(245, 158, 11, 0.4); }
+        .fridge[data-tier="4"] .fridge-door { background: #4c1d95; border: 4px solid #a855f7; box-shadow: inset -10px 0 20px rgba(0,0,0,0.4), 0 0 20px rgba(168, 85, 247, 0.5); }
+        .fridge[data-tier="5"] .fridge-door { background: #991b1b; border: 4px solid #ef4444; box-shadow: inset -10px 0 20px rgba(0,0,0,0.4), 0 0 25px rgba(239, 68, 68, 0.6); }
+        .fridge[data-tier="6"] .fridge-door { background: #030712; border: 4px solid #ec4899; box-shadow: inset -10px 0 25px rgba(236,72,153,0.2), 0 0 35px rgba(236, 72, 153, 0.8); }
+
+        /* --- THE NESTED HANDLE ELEMENT --- */
+        .door-handle {
+            width: 14px;
+            height: 75px;
+            background: linear-gradient(180deg, #cbd5e1, #94a3b8);
+            border-radius: 6px;
+            box-shadow: -3px 2px 5px rgba(0, 0, 0, 0.4), inset 1px 1px 2px white;
+            border: 1px solid #64748b;
+            transition: transform 0.3s ease, background 0.3s ease;
         }
-        
-        /* --- CALIBRATED HANDLE SWING ANIMATION --- */
-.fridge.open::before { 
-    transform: rotateY(-115deg) translateZ(1px) translateX(190px);
-    opacity: 0;
-    pointer-events: none;
-}
+
+        .fridge:hover .door-handle {
+            background: linear-gradient(180deg, #ffffff, #cbd5e1);
+            transform: scaleX(1.05);
+        }
+
+        /* --- GLITCH-PROOF SWING TRIGGER --- */
+        .fridge.open .fridge-door {
+            transform: rotateY(-125deg);
+        }
 
         .status-box {
             background: #0f172a;
@@ -234,12 +247,11 @@
             body { padding: 10px; align-items: flex-start; height: auto; }
             .game-container { flex-direction: column; gap: 15px; width: 100%; max-width: 100%; }
             .panel { padding: 16px; width: 100%; box-sizing: border-box; }
-            .fridge { width: 180px; height: 260px; margin: 15px auto; }
-            .fridge-inside { font-size: 3rem; }
+            .fridge { width: 180px; height: 280px; margin: 15px auto; }
+            .loot-drop-zone { font-size: 3.5rem; }
             .wallet-box { font-size: 1.2rem; padding: 10px; }
         }
     </style>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -262,7 +274,10 @@
             
             <div class="fridge" id="myFridge" data-tier="1">
                 <div class="fridge-inside">
-                    <span id="food-item">❓</span>
+                    <span id="food-item" class="loot-drop-zone">❓</span>
+                </div>
+                <div class="fridge-door">
+                    <div class="door-handle"></div>
                 </div>
             </div>
 
@@ -421,20 +436,26 @@
             const roll = Math.random();
             const currentConfig = fridgeTiers[currentFridgeTier];
             
-            if (roll < currentConfig.caviarChance) {
-                inventory.caviar++;
-                foodDisplay.textContent = "👑";
-                gameStatus.textContent = "💎 EXOTIC ASSET OUTLET! Found Black Caviar!";
-            } else if (roll < (currentConfig.caviarChance + currentConfig.milkChance)) {
-                inventory.milk++;
-                foodDisplay.textContent = "🥛";
-                gameStatus.textContent = "Acquired Fresh Milk cargo.";
-            } else {
-                inventory.pizza++;
-                foodDisplay.textContent = "🍕";
-                gameStatus.textContent = "Pulled Standard Pizza portion.";
-            }
-            updateUI();
+            // Visual pop dynamic animation trigger
+            foodDisplay.style.transform = "scale(0.5)";
+            
+            setTimeout(() => {
+                if (roll < currentConfig.caviarChance) {
+                    inventory.caviar++;
+                    foodDisplay.textContent = "👑";
+                    gameStatus.textContent = "💎 EXOTIC ASSET OUTLET! Found Black Caviar!";
+                } else if (roll < (currentConfig.caviarChance + currentConfig.milkChance)) {
+                    inventory.milk++;
+                    foodDisplay.textContent = "🥛";
+                    gameStatus.textContent = "Acquired Fresh Milk cargo.";
+                } else {
+                    inventory.pizza++;
+                    foodDisplay.textContent = "🍕";
+                    gameStatus.textContent = "Pulled Standard Pizza portion.";
+                }
+                foodDisplay.style.transform = "scale(1)";
+                updateUI();
+            }, 150);
         }
 
         function sellItem(itemKey) {
@@ -460,7 +481,7 @@
                 const newConfig = fridgeTiers[currentFridgeTier];
                 document.getElementById('fridge-name').textContent = newConfig.name;
                 document.getElementById('tier-number').textContent = currentFridgeTier;
-                fridge.setAttribute('data-tier', currentFridgeTier); // Updates CSS to swap door color
+                fridge.setAttribute('data-tier', currentFridgeTier); 
                 
                 const upgradeBtn = document.getElementById('upgrade-btn');
                 if (newConfig.upgradeCost === null) {
@@ -475,7 +496,7 @@
             }
         }
 
-        // --- CLOCK WORK: REALTIME MARKETS ---
+        // --- REALTIME MARKETS ---
         setInterval(function() {
             marketPrices.pizza = Math.max(3, marketPrices.pizza + (Math.floor(Math.random() * 9) - 4));
             marketPrices.milk = Math.max(1, marketPrices.milk + (Math.floor(Math.random() * 5) - 2));
@@ -524,7 +545,6 @@
 
         setInterval(fetchLeaderboard, 10000);
     </script>
-
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
