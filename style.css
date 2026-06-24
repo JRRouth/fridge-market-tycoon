@@ -215,3 +215,40 @@ button {
 
 .neon-divider { border: 0; height: 1px; background: linear-gradient(90deg, transparent, #243557, transparent); margin: 25px 0; }
 .ticker-note { font-size: 0.8rem; color: #64748b; }
+
+/* --- MOBILE RESPONSIVE MEDIA QUERY --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        align-items: flex-start; /* Allows scrolling down on long screens */
+        height: auto;
+    }
+
+    .game-container {
+        flex-direction: column; /* Stacks the 3 panels vertically instead of sideways */
+        gap: 15px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .panel {
+        padding: 16px; /* Scales down padding so things aren't too bulky */
+        width: 100%;
+        box-sizing: border-box; /* Prevents panels from breaking screen edges */
+    }
+
+    .fridge {
+        width: 180px;  /* Scales down the fridge slightly to fit small screens */
+        height: 260px; 
+        margin: 15px auto;
+    }
+
+    .fridge-inside {
+        font-size: 3rem; /* Shrinks the food emojis slightly */
+    }
+
+    .wallet-box {
+        font-size: 1.2rem;
+        padding: 10px;
+    }
+}
