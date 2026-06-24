@@ -1,5 +1,4 @@
 // --- DATABASE INITIALIZATION ---
-// FIXED: Cleaned URL string (removed '/rest/v1/') so the SDK maps endpoint paths accurately
 const SUPABASE_URL = "https://jypzclhjorqfddwjspiw.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5cHpjbGhqb3JxZmRkd2pzcGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNzYzOTUsImV4cCI6MjA5Nzg1MjM5NX0.MxC1e7ReQjG3ms3CCTPHBb3jONTUZyoSnRtHhFD3tyQ";
 
@@ -48,13 +47,12 @@ document.getElementById('save-username-btn').addEventListener('click', async () 
     
     playerUsername = nameInput;
     localStorage.setItem('fridge_tycoon_username', playerUsername);
-    
-    // SAFETY TRICK: Hide the modal first so game loops don't freeze if database response lags
     document.getElementById('username-modal').style.display = 'none';
     gameStatus.textContent = `Welcome, ${playerUsername}! Initializing market scanner...`;
     
     try {
-        await db.from('leaderboard').insert([{ username: playerUsername, high_score: playerCoins }]);
+        // FIXED: Targeted capitalized 'Leaderboard'
+        await db.from('Leaderboard').insert([{ username: playerUsername, high_score: playerCoins }]);
     } catch (err) {
         console.error("Database connection registration error:", err);
     }
@@ -157,7 +155,8 @@ async function updateUI() {
     
     if (playerUsername) {
         try {
-            await db.from('leaderboard').update({ high_score: playerCoins }).eq('username', playerUsername);
+            // FIXED: Targeted capitalized 'Leaderboard'
+            await db.from('Leaderboard').update({ high_score: playerCoins }).eq('username', playerUsername);
         } catch (e) {
             console.warn("Background score update skipped structural frames:", e);
         }
@@ -166,7 +165,8 @@ async function updateUI() {
 
 async function fetchLeaderboard() {
     try {
-        const { data, error } = await db.from('leaderboard').select('username, high_score').order('high_score', { ascending: false }).limit(5);
+        // FIXED: Targeted capitalized 'Leaderboard'
+        const { data, error } = await db.from('Leaderboard').select('username, high_score').order('high_score', { ascending: false }).limit(5);
         if (error || !data) return;
         
         const listElement = document.getElementById('leaderboard-list');
