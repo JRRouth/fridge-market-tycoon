@@ -6,6 +6,7 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- GLOBAL GAME VARIABLES ---
 let playerCoins = 50;
+let dbHighScore = 0; // Tracks historical high score baseline from the server
 let currentFridgeTier = 1;
 let playerUsername = "";
 
@@ -25,13 +26,28 @@ const fridge = document.getElementById('myFridge');
 const foodDisplay = document.getElementById('food-item');
 const gameStatus = document.getElementById('game-status');
 
-// --- USER MANAGEMENT SUBSYSTEM ---
-window.addEventListener('DOMContentLoaded', () => {
+// --- USER MANAGEMENT SUBSYSTEM (AUTHENTICATION LOOP) ---
+window.addEventListener('DOMContentLoaded', async () => {
     const savedName = localStorage.getItem('fridge_tycoon_username');
     if (savedName) {
         playerUsername = savedName;
         document.getElementById('username-modal').style.display = 'none';
-        gameStatus.textContent = `Welcome back, ${playerUsername}!`;
+        gameStatus.textContent = "Connecting to high score records...";
+        
+        try {
+            // Fetch database record to extract peak high score
+            const { data } = await db.from('Leaderboard').select('high_score').eq('username', playerUsername).maybeSingle();
+            if (data) {
+                dbHighScore = data.high_score;
+            }
+        } catch(e) {
+            console.error("Failed to load historical database record:", e);
+        }
+        
+        // Arcade Reset Setup: Pocket balance resets to $50 baseline on launch
+        playerCoins = 50; 
+        updateUI();
+        gameStatus.textContent = `Welcome back, ${playerUsername}! All-time high: $${dbHighScore}`;
         fetchLeaderboard();
     } else {
         gameStatus.textContent = "Awaiting credentials identification access...";
@@ -48,17 +64,28 @@ document.getElementById('save-username-btn').addEventListener('click', async () 
     playerUsername = nameInput;
     localStorage.setItem('fridge_tycoon_username', playerUsername);
     document.getElementById('username-modal').style.display = 'none';
-    gameStatus.textContent = `Welcome, ${playerUsername}! Initializing market scanner...`;
+    gameStatus.textContent = `Syncing profile layer for ${playerUsername}...`;
     
     try {
-        // FIXED: Targeted capitalized 'Leaderboard'
-        await db.from('Leaderboard').insert([{ username: playerUsername, high_score: playerCoins }]);
+        // Dynamic check for user historical records
+        const { data } = await db.from('Leaderboard').select('high_score').eq('username', playerUsername).maybeSingle();
+        
+        if (data) {
+            dbHighScore = data.high_score;
+            gameStatus.textContent = `Tag recognized! Personal Best: $${dbHighScore}. Session reset to $50.`;
+        } else {
+            dbHighScore = 50;
+            // Upsert baseline profile records safely
+            await db.from('Leaderboard').upsert({ username: playerUsername, high_score: 50 }, { onConflict: 'username' });
+            gameStatus.textContent = `Welcome, ${playerUsername}! Initializing new market scanner...`;
+        }
     } catch (err) {
         console.error("Database connection registration error:", err);
     }
     
-    // Wait half a second for Supabase to write the data, then pull the fresh leaderboard
-    setTimeout(fetchLeaderboard, 500); 
+    playerCoins = 50;
+    updateUI();
+    setTimeout(fetchLeaderboard, 500);
 });
 
 // --- CORE INTERACTION ENGINE ---
@@ -103,67 +130,7 @@ function sellItem(itemKey) {
         inventory[itemKey]--;
         playerCoins += marketPrices[itemKey];
         updateUI();
-        gameStatus.textContent = `Liquidated ${itemKey} at market peak for +$${marketPrices[itemKey]}!`;
-    } else {
-        gameStatus.textContent = `❌ Transaction failed: Zero '${itemKey}' units.`;
-    }
-}
-
-function purchaseFridgeUpgrade() {
-    const currentConfig = fridgeTiers[currentFridgeTier];
-    const cost = currentConfig.upgradeCost;
-    if (cost === null) return;
-    
-    if (playerCoins >= cost) {
-        playerCoins -= cost;
-        currentFridgeTier++;
-        
-        const newConfig = fridgeTiers[currentFridgeTier];
-        document.getElementById('fridge-name').textContent = newConfig.name;
-        document.getElementById('tier-number').textContent = currentFridgeTier;
-        fridge.setAttribute('data-tier', currentFridgeTier); 
-        
-        const upgradeBtn = document.getElementById('upgrade-btn');
-        if (newConfig.upgradeCost === null) {
-            upgradeBtn.textContent = "MAXIMUM EVOLUTION REACHED";
-            upgradeBtn.style.background = "#334155";
-        } else {
-            upgradeBtn.textContent = `Buy ${fridgeTiers[currentFridgeTier + 1].name} ($${newConfig.upgradeCost})`;
-        }
-        updateUI();
-    } else {
-        gameStatus.textContent = `❌ Missing funds! You require $${cost} to advance.`;
-    }
-}
-
-// --- CLOCK WORK: REALTIME MARKETS ---
-setInterval(function() {
-    marketPrices.pizza = Math.max(3, marketPrices.pizza + (Math.floor(Math.random() * 9) - 4));
-    marketPrices.milk = Math.max(1, marketPrices.milk + (Math.floor(Math.random() * 5) - 2));
-    marketPrices.caviar = Math.max(40, marketPrices.caviar + (Math.floor(Math.random() * 61) - 30));
-    updateUI();
-}, 7000);
-
-// --- SYNC ENGINE LAYER ---
-async function updateUI() {
-    document.getElementById('wallet').textContent = `Balance: $${playerCoins}`;
-    document.getElementById('inv-pizza').textContent = inventory.pizza;
-    document.getElementById('inv-milk').textContent = inventory.milk;
-    document.getElementById('inv-caviar').textContent = inventory.caviar;
-    document.getElementById('price-pizza').textContent = `$${marketPrices.pizza}`;
-    document.getElementById('price-milk').textContent = `$${marketPrices.milk}`;
-    document.getElementById('price-caviar').textContent = `$${marketPrices.caviar}`;
-    
-    if (playerUsername) {
-        try {
-            // FIXED: Targeted capitalized 'Leaderboard'
-            await db.from('Leaderboard').update({ high_score: playerCoins }).eq('username', playerUsername);
-        } catch (e) {
-            console.warn("Background score update skipped structural frames:", e);
-        }
-    }
-}
-
+        gameStatus.textContent = `Liquidated ${itemKey} for
 async function fetchLeaderboard() {
     try {
         // FIXED: Targeted capitalized 'Leaderboard'
