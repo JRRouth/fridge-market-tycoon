@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fridge Market Tycoon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-container">
+        
+        <div class="panel fridge-panel">
+            <h2 id="fridge-name">Rusty Mini-Fridge</h2>
+            <p>Click fridge to look inside (Costs $2)</p>
+            
+            <div class="fridge" id="myFridge">
+                <div class="fridge-inside">
+                    <span id="food-item">❓</span>
+                </div>
+                <div class="fridge-door">
+                    <div class="handle"></div>
+                </div>
+            </div>
+            <p id="game-status">Ready to open...</p>
+        </div>
+
+        <div class="panel dashboard-panel">
+            <h2>Dashboard</h2>
+            <div class="wallet-box">
+                <span id="wallet">Balance: $50</span>
+            </div>
+            
+            <h3>Your Inventory</h3>
+            <ul class="inventory-list">
+                <li>🍕 Pizza: <span id="inv-pizza">0</span></li>
+                <li>🥛 Milk: <span id="inv-milk">0</span></li>
+                <li>👑 Caviar: <span id="inv-caviar">0</span></li>
+            </ul>
+        </div>
+
+        <div class="panel market-panel">
+            <h2>Live Food Market</h2>
+            <p class="ticker-note">Prices change every 7 seconds!</p>
+            
+            <div class="market-item">
+                <span>🍕 Pizza Price: <strong id="price-pizza">$10</strong></span>
+                <button onclick="sellItem('pizza')">Sell 1</button>
+            </div>
+            <div class="market-item">
+                <span>🥛 Milk Price: <strong id="price-milk">$5</strong></span>
+                <button onclick="sellItem('milk')">Sell 1</button>
+            </div>
+            <div class="market-item">
+                <span>👑 Caviar Price: <strong id="price-caviar">$100</strong></span>
+                <button onclick="sellItem('caviar')">Sell 1</button>
+            </div>
+
+            <hr>
+
+            <h2>Upgrade Shop</h2>
+            <button id="upgrade-btn" onclick="purchaseFridgeUpgrade()">Upgrade Fridge ($200)</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
