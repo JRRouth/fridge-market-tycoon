@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fridge Market Tycoon - Leaderboard</title>
+    <!-- Include Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #888888;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: transform 0.2s ease;
+        }
+
+        .row:hover {
+            transform: scale(1.01);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .rank {
+            font-weight: 700;
+            width: 40px;
+            color: #666edb;
+        }
+
+        .name {
+            flex-grow: 1;
+            font-weight: 500;
+            color: #e0e0e0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .score {
+            font-family: monospace;
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        /* Styling Top 3 uniquely */
+        .rank-1 { border-color: rgba(255, 215, 0, 0.3); background: rgba(255, 215, 0, 0.03); }
+        .rank-1 .rank { color: #ffd700; }
+        
+        .rank-2 { border-color: rgba(192, 192, 192, 0.3); background: rgba(192, 192, 192, 0.03); }
+        .rank-2 .rank { color: #c0c0c0; }
+
+        .rank-3 { border-color: rgba(205, 127, 50, 0.3); background: rgba(205, 127, 50, 0.03); }
+        .rank-3 .rank { color: #cd7f32; }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 2rem;
+            color: #888888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #ffffff;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Global Rankings</h1>
+        <div class="subtitle">Fridge Market Tycoon</div>
+
+        <div id="leaderboard" class="leaderboard-list">
+            <div class="loading">Fetching market moguls...</div>
+        </div>
+
+        <center><a href="./index.html" class="back-btn">← Back to Market Desk</a></center>
+    </div>
+
+    <script>
+        // REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDS
+        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboard');
+            
+            // Adjust 'leaderboard', 'username', and 'high_score' to match your actual column names
+            const { data, error } = await _supabase
+                .from('leaderboard') 
+                .select('username, high_score')
+                .order('high_score', { ascending: false })
+                .limit(25);
+
+            if (error) {
+                console.error(error);
+                container.innerHTML = '<div class="loading" style="color: #ff4a4a;">Failed to load data.</div>';
+                return;
+            }
+
+            if (data.length === 0) {
+                container.innerHTML = '<div class="loading">No scores logged yet.</div>';
+                return;
+            }
+
+            container.innerHTML = data.map((player, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                if (rank <= 3) rankClass = `rank-${rank}`;
+
+                return `
+                    <div class="row ${rankClass}">
+                        <span class="rank">#${rank}</span>
+                        <span class="name">${escapeHTML(player.username)}</span>
+                        <span class="score">$${Number(player.high_score).toLocaleString()}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Quick helper to prevent any funny business with custom script names
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        loadLeaderboard();
+    </script>
+</body>
+</html>
