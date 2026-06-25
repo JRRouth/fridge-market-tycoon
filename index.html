@@ -392,6 +392,22 @@
             }
         });
 
+        // Universal interaction catch listener to trigger standby audio on any user action
+        window.addEventListener('click', function fallbackAudioIgnition() {
+            const track = document.getElementById('bg-music');
+            if (track.paused) {
+                track.volume = 0.15;
+                track.play()
+                    .then(() => {
+                        // Cleans itself out once running successfully to free system listeners
+                        window.removeEventListener('click', fallbackAudioIgnition);
+                    })
+                    .catch(e => console.log("Autoplay context block holding."));
+            } else {
+                window.removeEventListener('click', fallbackAudioIgnition);
+            }
+        });
+
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const nameInput = document.getElementById('username-input').value.trim();
             if (nameInput.length < 3) { alert("Username must be at least 3 characters!"); return; }
