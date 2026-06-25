@@ -260,7 +260,9 @@
 </head>
 <body>
 
-    <audio id="bg-music" loop src="bg-music.mp3"></audio>
+    <audio id="sfx-open" src="open.mp3"></audio>
+    <audio id="sfx-drop" src="drop.mp3"></audio>
+    <audio id="sfx-sell" src="sell.mp3"></audio>
 
     <div id="username-modal" class="modal-overlay">
         <div class="modal-content">
@@ -370,6 +372,14 @@
         const foodDisplay = document.getElementById('food-item');
         const gameStatus = document.getElementById('game-status');
 
+        function playSFX(elementId) {
+            const sound = document.getElementById(elementId);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("SFX sync bypass active."));
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             const savedName = localStorage.getItem('fridge_tycoon_username');
             if (savedName) {
@@ -377,10 +387,6 @@
                 document.getElementById('username-modal').style.display = 'none';
                 gameStatus.textContent = "Connecting to high score records...";
                 
-                const track = document.getElementById('bg-music');
-                track.volume = 0.15;
-                track.play().catch(() => console.log("Music standby: awaiting interaction."));
-
                 try {
                     const { data } = await db.from('Leaderboard').select('high_score').eq('username', playerUsername).maybeSingle();
                     if (data) dbHighScore = data.high_score;
@@ -392,30 +398,10 @@
             }
         });
 
-        // Universal interaction catch listener to trigger standby audio on any user action
-        window.addEventListener('click', function fallbackAudioIgnition() {
-            const track = document.getElementById('bg-music');
-            if (track.paused) {
-                track.volume = 0.15;
-                track.play()
-                    .then(() => {
-                        // Cleans itself out once running successfully to free system listeners
-                        window.removeEventListener('click', fallbackAudioIgnition);
-                    })
-                    .catch(e => console.log("Autoplay context block holding."));
-            } else {
-                window.removeEventListener('click', fallbackAudioIgnition);
-            }
-        });
-
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const nameInput = document.getElementById('username-input').value.trim();
             if (nameInput.length < 3) { alert("Username must be at least 3 characters!"); return; }
             
-            const track = document.getElementById('bg-music');
-            track.volume = 0.15;
-            track.play().catch(e => console.warn(e));
-
             playerUsername = nameInput;
             localStorage.setItem('fridge_tycoon_username', playerUsername);
             document.getElementById('username-modal').style.display = 'none';
@@ -442,7 +428,7 @@
             try {
                 await db.from('Leaderboard').delete().eq('username', playerUsername);
             } catch (err) {
-                console.warn("Database storage row bypass drop structural frame:", err);
+                console.warn("Database storage exception drop:", err);
             }
 
             localStorage.removeItem('fridge_tycoon_username');
@@ -453,11 +439,13 @@
             if (fridge.classList.contains('open')) {
                 fridge.classList.remove('open');
                 fridge.classList.remove('remove');
+                playSFX('sfx-open');
                 gameStatus.textContent = "Fridge closed. Scanner idle.";
                 setTimeout(() => { foodDisplay.textContent = "❓"; }, 500);
             } else {
                 if (playerCoins < 2) { gameStatus.textContent = "⚠️ INSIGNIFICANT CREDIT! Liquidate goods."; return; }
                 playerCoins -= 2;
+                playSFX('sfx-open');
                 determineLoot();
                 fridge.classList.add('open');
             }
@@ -480,6 +468,7 @@
                 } else {
                     inventory.pizza++; foodDisplay.textContent = "🍕"; gameStatus.textContent = "Pulled Standard Pizza portion.";
                 }
+                playSFX('sfx-drop');
                 foodDisplay.style.transform = "scale(1)";
                 updateUI();
             }, 150);
@@ -489,6 +478,7 @@
             if (inventory[itemKey] > 0) {
                 inventory[itemKey]--;
                 playerCoins += marketPrices[itemKey];
+                playSFX('sfx-sell');
                 updateUI();
                 gameStatus.textContent = `Liquidated ${itemKey} for +$${marketPrices[itemKey]}!`;
             } else {
