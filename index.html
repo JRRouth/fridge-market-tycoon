@@ -22,7 +22,7 @@
         .game-container {
             display: flex;
             gap: 25px;
-            max-width: 1100px;
+            max-width: 1200px;
             width: 100%;
         }
 
@@ -64,12 +64,9 @@
             border-radius: 6px;
             border: 1px solid #334155;
             margin-bottom: 15px;
+            cursor: pointer;
         }
-        .btn-change-tag:hover {
-            background: #ef4444;
-            color: white;
-            border-color: #ef4444;
-        }
+        .btn-change-tag:hover { background: #ef4444; color: white; border-color: #ef4444; }
 
         .tier-badge {
             position: absolute;
@@ -156,13 +153,19 @@
             padding: 12px;
             border-radius: 4px;
             font-size: 0.9rem;
-            min-height: 24px;
+            min-height: 40px;
             color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        .status-flash { border-left-color: #f59e0b; color: #f59e0b; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
         .inventory-list { list-style: none; padding: 0; margin: 20px 0; }
         .inventory-list li {
-            display: flex; justify-content: space-between;
+            display: flex; justify-content: space-between; align-items: center;
             background: #1e293b;
             padding: 10px 16px;
             margin-bottom: 8px;
@@ -179,52 +182,46 @@
             border: 1px solid #1f2937;
         }
 
-        .ticker-note { font-size: 0.75rem; color: #f59e0b; margin-top: -5px; }
+        .ticker-note { font-size: 0.75rem; color: #cbd5e1; margin-top: -5px; }
         .text-green { color: #10b981; }
+        .text-red { color: #ef4444; }
+        .trend-arrow { font-size: 0.8rem; margin-left: 4px; font-weight: bold; }
 
         button { font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s ease; border: none; }
         .btn-sell { background: #ef4444; color: white; padding: 6px 14px; border-radius: 4px; font-size: 0.85rem; }
         .btn-sell:hover { background: #dc2626; transform: scale(1.05); }
+        .btn-clear-spoiled { background: #f59e0b; color: #0f172a; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
 
         .btn-upgrade {
             background: linear-gradient(135deg, #a855f7, #7c3aed);
-            color: white; width: 100%; padding: 14px; font-size: 1.1rem;
+            color: white; width: 100%; padding: 12px; font-size: 1rem;
             box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); margin-top: 10px; border-radius: 8px;
         }
         .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5); }
 
+        .btn-drone {
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            color: white; width: 100%; padding: 12px; font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); margin-top: 10px; border-radius: 8px;
+        }
+        .btn-drone:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5); }
+
+        /* Escrow Terminal */
+        .escrow-terminal {
+            background: #090d16; border: 1px solid #10b981; border-radius: 10px;
+            padding: 12px; margin-top: 15px; text-align: left;
+        }
+        .escrow-header { font-size: 0.8rem; color: #10b981; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .btn-gamble { background: #10b981; color: #090d16; width: 100%; padding: 8px; border-radius: 4px; font-size: 0.85rem; }
+        .btn-gamble:hover { background: #34d399; }
+
         .leaderboard-box { 
-            background: #111827; 
-            padding: 15px; 
-            border-radius: 10px; 
-            border: 1px solid #243557; 
-            margin: 20px 0 10px 0; 
-            cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+            background: #111827; padding: 15px; border-radius: 10px; border: 1px solid #243557; 
+            margin: 20px 0 10px 0; cursor: pointer; transition: all 0.2s ease;
         }
-        .leaderboard-box:hover {
-            transform: scale(1.02);
-            border-color: #3b82f6;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
-        }
-        .leaderboard-box:active {
-            transform: scale(0.99);
-        }
-        .leaderboard-box h3 {
-            margin: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .leaderboard-box h3::after {
-            content: '↗';
-            font-size: 0.95rem;
-            color: #64748b;
-            transition: color 0.2s ease;
-        }
-        .leaderboard-box:hover h3::after {
-            color: #3b82f6;
-        }
+        .leaderboard-box:hover { transform: scale(1.02); border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2); }
+        .leaderboard-box h3 { margin: 0; display: flex; justify-content: space-between; align-items: center; }
+        .leaderboard-box h3::after { content: '↗'; font-size: 0.95rem; color: #64748b; }
 
         #leaderboard-list { text-align: left; padding-left: 20px; margin: 10px 0 0 0; color: #94a3b8; }
         #leaderboard-list li { padding: 4px 0; font-size: 0.95rem; display: flex; justify-content: space-between; }
@@ -235,18 +232,15 @@
             background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center; z-index: 100;
         }
-
         .modal-content {
             background: #131c2e; border: 2px solid #3b82f6; padding: 30px;
             border-radius: 16px; text-align: center; max-width: 400px; width: 90%;
             box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
         }
-
         .modal-content h2 { margin-top: 0; color: #3b82f6; }
         .modal-content p { color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px; }
         .modal-content input { width: 80%; padding: 10px; background: #0f172a; border: 1px solid #243557; border-radius: 6px; color: white; font-size: 1rem; text-align: center; margin-bottom: 20px; }
         .modal-content button { background: #3b82f6; color: white; padding: 10px 24px; border-radius: 6px; font-size: 1rem; }
-        .modal-content button:hover { background: #2563eb; }
 
         @media (max-width: 768px) {
             body { padding: 10px; align-items: flex-start; height: auto; }
@@ -290,6 +284,14 @@
             </div>
 
             <div class="status-box" id="game-status">Initializing core logic engine modules...</div>
+            
+            <div class="escrow-terminal">
+                <div class="escrow-header">
+                    <span>⚡ ESCROW BLOCKCHAIN DECK</span>
+                    <span id="escrow-odds">50/50 Win</span>
+                </div>
+                <button class="btn-gamble" onclick="triggerEscrowHack()">Execute Market Hack (Costs $25)</button>
+            </div>
         </div>
 
         <div class="panel inventory-panel">
@@ -303,31 +305,35 @@
                 <li><span>🧊 Pod Ice Cream:</span> <span id="inv-icecream">0</span></li>
                 <li><span>🍣 Fusion Sushi:</span> <span id="inv-sushi">0</span></li>
                 <li><span>👑 Black Caviar:</span> <span id="inv-caviar">0</span></li>
+                <li style="border-color: #ef4444;" id="spoiled-row">
+                    <span>🤢 Spoiled Mass: <strong id="inv-spoiled" style="color: #ef4444;">0</strong></span>
+                    <button class="btn-clear-spoiled" onclick="clearSpoiledCargo()">Bio-Clean ($5)</button>
+                </li>
             </ul>
         </div>
 
         <div class="panel market-panel">
             <h2>LIVE MARKET</h2>
-            <p class="ticker-note">⚡ Volatility Engine Active: Prices change every 7s</p>
+            <p class="ticker-note" id="market-ticker">⚡ Volatility Engine Active: Prices change every 7s</p>
             
             <div class="market-item">
-                <span>🍕 Pizza: <strong id="price-pizza" class="text-green">$10</strong></span>
+                <span>🍕 Pizza: <strong id="price-pizza" class="text-green">$10</strong><span id="trend-pizza" class="trend-arrow"></span></span>
                 <button class="btn-sell" onclick="sellItem('pizza')">SELL</button>
             </div>
             <div class="market-item">
-                <span>🥛 Milk: <strong id="price-milk" class="text-green">$5</strong></span>
+                <span>🥛 Milk: <strong id="price-milk" class="text-green">$5</strong><span id="trend-milk" class="trend-arrow"></span></span>
                 <button class="btn-sell" onclick="sellItem('milk')">SELL</button>
             </div>
             <div class="market-item">
-                <span>🧊 Ice Cream: <strong id="price-icecream" class="text-green">$25</strong></span>
+                <span>🧊 Ice Cream: <strong id="price-icecream" class="text-green">$25</strong><span id="trend-icecream" class="trend-arrow"></span></span>
                 <button class="btn-sell" onclick="sellItem('icecream')">SELL</button>
             </div>
             <div class="market-item">
-                <span>🍣 Sushi: <strong id="price-sushi" class="text-green">$55</strong></span>
+                <span>🍣 Sushi: <strong id="price-sushi" class="text-green">$55</strong><span id="trend-sushi" class="trend-arrow"></span></span>
                 <button class="btn-sell" onclick="sellItem('sushi')">SELL</button>
             </div>
             <div class="market-item">
-                <span>👑 Caviar: <strong id="price-caviar" class="text-green">$100</strong></span>
+                <span>👑 Caviar: <strong id="price-caviar" class="text-green">$100</strong><span id="trend-caviar" class="trend-arrow"></span></span>
                 <button class="btn-sell" onclick="sellItem('caviar')">SELL</button>
             </div>
 
@@ -341,6 +347,7 @@
             <hr class="neon-divider">
             <h2>UPGRADES</h2>
             <button id="upgrade-btn" class="btn-upgrade" onclick="purchaseFridgeUpgrade()">Buy Tier 2 Smart Fridge ($150)</button>
+            <button id="drone-btn" class="btn-drone" onclick="purchaseDrone()">Deploy Auto-Extraction Drone ($300)</button>
         </div>
 
     </div>
@@ -355,9 +362,14 @@
         let dbHighScore = 0; 
         let currentFridgeTier = 1;
         let playerUsername = "";
+        let hasDrone = false;
 
-        let inventory = { pizza: 0, milk: 0, icecream: 0, sushi: 0, caviar: 0 };
+        let inventory = { pizza: 0, milk: 0, icecream: 0, sushi: 0, caviar: 0, spoiled: 0 };
         let marketPrices = { pizza: 10, milk: 5, icecream: 25, sushi: 55, caviar: 100 };
+        
+        // Flash event multiplier maps
+        let activeEvent = null; 
+        let eventTimeout = null;
 
         const fridgeTiers = {
             1: { name: "Rusty Mini-Fridge", upgradeCost: 150, pizzaChance: 0.65, milkChance: 0.30, icecreamChance: 0.05, sushiChance: 0.00, caviarChance: 0.00 },
@@ -376,7 +388,7 @@
             const sound = document.getElementById(elementId);
             if (sound) {
                 sound.currentTime = 0;
-                sound.play().catch(e => console.log("SFX sync bypass active."));
+                sound.play().catch(e => console.log("SFX engine standby setup pipeline holding."));
             }
         }
 
@@ -425,12 +437,7 @@
             if (!confirmPurge) return;
 
             gameStatus.textContent = "Purging server row memory addresses...";
-            try {
-                await db.from('Leaderboard').delete().eq('username', playerUsername);
-            } catch (err) {
-                console.warn("Database storage exception drop:", err);
-            }
-
+            try { await db.from('Leaderboard').delete().eq('username', playerUsername); } catch (err) {}
             localStorage.removeItem('fridge_tycoon_username');
             location.reload(); 
         }
@@ -438,49 +445,63 @@
         fridge.addEventListener('click', function() {
             if (fridge.classList.contains('open')) {
                 fridge.classList.remove('open');
-                fridge.classList.remove('remove');
                 playSFX('sfx-open');
-                gameStatus.textContent = "Fridge closed. Scanner idle.";
+                gameStatus.textContent = activeEvent ? `[ALERT] ${activeEvent.desc}` : "Fridge closed. Scanner idle.";
                 setTimeout(() => { foodDisplay.textContent = "❓"; }, 500);
             } else {
                 if (playerCoins < 2) { gameStatus.textContent = "⚠️ INSIGNIFICANT CREDIT! Liquidate goods."; return; }
                 playerCoins -= 2;
                 playSFX('sfx-open');
-                determineLoot();
+                determineLoot(false);
                 fridge.classList.add('open');
             }
         });
 
-        function determineLoot() {
+        function determineLoot(isDronePassive = false) {
             const roll = Math.random();
             const c = fridgeTiers[currentFridgeTier];
-            foodDisplay.style.transform = "scale(0.5)";
             
-            setTimeout(() => {
-                if (roll < c.caviarChance) {
-                    inventory.caviar++; foodDisplay.textContent = "👑"; gameStatus.textContent = "💎 EXOTIC ASSET OUTLET! Found Black Caviar!";
-                } else if (roll < c.caviarChance + c.sushiChance) {
-                    inventory.sushi++; foodDisplay.textContent = "🍣"; gameStatus.textContent = "Synthesized Cyber Fusion Sushi rolling frames!";
-                } else if (roll < c.caviarChance + c.sushiChance + c.icecreamChance) {
-                    inventory.icecream++; foodDisplay.textContent = "🧊"; gameStatus.textContent = "Extracted deep frozen Pod Ice Cream!";
-                } else if (roll < c.caviarChance + c.sushiChance + c.icecreamChance + c.milkChance) {
-                    inventory.milk++; foodDisplay.textContent = "🥛"; gameStatus.textContent = "Acquired Fresh Milk cargo.";
-                } else {
-                    inventory.pizza++; foodDisplay.textContent = "🍕"; gameStatus.textContent = "Pulled Standard Pizza portion.";
-                }
+            let itemExtracted = "";
+            let emoji = "❓";
+            let alertMsg = "";
+
+            if (roll < c.caviarChance) { itemExtracted = "caviar"; emoji = "👑"; alertMsg = "💎 EXOTIC ASSET OUTLET! Found Black Caviar!"; }
+            else if (roll < c.caviarChance + c.sushiChance) { itemExtracted = "sushi"; emoji = "🍣"; alertMsg = "Synthesized Cyber Fusion Sushi rolling frames!"; }
+            else if (roll < c.caviarChance + c.sushiChance + c.icecreamChance) { itemExtracted = "icecream"; emoji = "🧊"; alertMsg = "Extracted deep frozen Pod Ice Cream!"; }
+            else if (roll < c.caviarChance + c.sushiChance + c.icecreamChance + c.milkChance) { itemExtracted = "milk"; emoji = "🥛"; alertMsg = "Acquired Fresh Milk cargo."; }
+            else { itemExtracted = "pizza"; emoji = "🍕"; alertMsg = "Pulled Standard Pizza portion."; }
+
+            inventory[itemExtracted]++;
+            
+            if (!isDronePassive) {
+                foodDisplay.style.transform = "scale(0.5)";
+                setTimeout(() => {
+                    foodDisplay.textContent = emoji;
+                    gameStatus.textContent = activeEvent ? `[ALERT] ${activeEvent.desc}` : alertMsg;
+                    playSFX('sfx-drop');
+                    foodDisplay.style.transform = "scale(1)";
+                    updateUI();
+                }, 150);
+            } else {
                 playSFX('sfx-drop');
-                foodDisplay.style.transform = "scale(1)";
                 updateUI();
-            }, 150);
+            }
         }
 
         function sellItem(itemKey) {
             if (inventory[itemKey] > 0) {
                 inventory[itemKey]--;
-                playerCoins += marketPrices[itemKey];
+                let payout = marketPrices[itemKey];
+                
+                // Process macro flash event multiplier vectors
+                if (activeEvent && activeEvent.target === itemKey) {
+                    payout = Math.floor(payout * activeEvent.mult);
+                }
+                
+                playerCoins += payout;
                 playSFX('sfx-sell');
                 updateUI();
-                gameStatus.textContent = `Liquidated ${itemKey} for +$${marketPrices[itemKey]}!`;
+                gameStatus.textContent = `Liquidated ${itemKey} for +$${payout}!`;
             } else {
                 gameStatus.textContent = `❌ Transaction failed: Zero units.`;
             }
@@ -508,12 +529,127 @@
             } else { gameStatus.textContent = `❌ Missing funds! Requires $${cost}.`; }
         }
 
+        function purchaseDrone() {
+            if (hasDrone) return;
+            if (playerCoins >= 300) {
+                playerCoins -= 300;
+                hasDrone = true;
+                const droneBtn = document.getElementById('drone-btn');
+                droneBtn.textContent = "DRONE ONLINE & EXTRACTING";
+                droneBtn.style.background = "#334155";
+                droneBtn.style.boxShadow = "none";
+                updateUI();
+                gameStatus.textContent = "🛸 Extraction Drone deployed. Gathering passive loops...";
+                startDroneLoop();
+            } else { gameStatus.textContent = "❌ Drone deployment denied: Requires $300."; }
+        }
+
+        function startDroneLoop() {
+            setInterval(() => {
+                if (hasDrone) {
+                    determineLoot(true);
+                }
+            }, 5000);
+        }
+
+        function triggerEscrowHack() {
+            if (playerCoins < 25) { gameStatus.textContent = "❌ Hack rejected: Requires $25 gas fee."; return; }
+            playerCoins -= 25;
+            gameStatus.textContent = "📡 Injecting payload exploit into ledger lines...";
+            updateUI();
+            
+            setTimeout(() => {
+                if (Math.random() > 0.5) {
+                    playerCoins += 65;
+                    gameStatus.textContent = "✅ EXPLOIT SUCCESSFUL! Ledger cleaned (+$65)";
+                } else {
+                    gameStatus.textContent = "🚨 TRACED BY FIREWALLS! Assets frozen (-$25)";
+                }
+                updateUI();
+            }, 1200);
+        }
+
+        function clearSpoiledCargo() {
+            if (inventory.spoiled === 0) return;
+            if (playerCoins >= 5) {
+                playerCoins -= 5;
+                inventory.spoiled = 0;
+                updateUI();
+                gameStatus.textContent = "♻️ Bio-clean complete. Storage sanitized.";
+            } else { gameStatus.textContent = "❌ Missing funds for bio-sanitization."; }
+        }
+
+        // Master 7-Second Market Volatility + Flash + Expiry Engine
         setInterval(function() {
-            marketPrices.pizza = Math.max(3, marketPrices.pizza + (Math.floor(Math.random() * 9) - 4));
-            marketPrices.milk = Math.max(1, marketPrices.milk + (Math.floor(Math.random() * 5) - 2));
-            marketPrices.icecream = Math.max(10, marketPrices.icecream + (Math.floor(Math.random() * 15) - 7));
-            marketPrices.sushi = Math.max(25, marketPrices.sushi + (Math.floor(Math.random() * 25) - 12));
-            marketPrices.caviar = Math.max(40, marketPrices.caviar + (Math.floor(Math.random() * 61) - 30));
+            const keys = ['pizza', 'milk', 'icecream', 'sushi', 'caviar'];
+            
+            // 1. Process Trend Arrows and Pricing Volatility
+            keys.forEach(key => {
+                let currentPrice = marketPrices[key];
+                let delta = 0;
+                
+                if (key === 'pizza') delta = Math.floor(Math.random() * 9) - 4;
+                if (key === 'milk') delta = Math.floor(Math.random() * 5) - 2;
+                if (key === 'icecream') delta = Math.floor(Math.random() * 15) - 7;
+                if (key === 'sushi') delta = Math.floor(Math.random() * 25) - 12;
+                if (key === 'caviar') delta = Math.floor(Math.random() * 61) - 30;
+
+                let nextPrice = currentPrice + delta;
+                if (key === 'pizza') nextPrice = Math.max(3, nextPrice);
+                if (key === 'milk') nextPrice = Math.max(1, nextPrice);
+                if (key === 'icecream') nextPrice = Math.max(10, nextPrice);
+                if (key === 'sushi') nextPrice = Math.max(25, nextPrice);
+                if (key === 'caviar') nextPrice = Math.max(40, nextPrice);
+
+                const trendElement = document.getElementById(`trend-${key}`);
+                if (nextPrice > currentPrice) {
+                    trendElement.textContent = "▲"; trendElement.className = "trend-arrow text-green";
+                } else if (nextPrice < currentPrice) {
+                    trendElement.textContent = "▼"; trendElement.className = "trend-arrow text-red";
+                } else {
+                    trendElement.textContent = "";
+                }
+                marketPrices[key] = nextPrice;
+            });
+
+            // 2. Process Rare Flash Market Macro Events (12% chance every tick)
+            if (!activeEvent && Math.random() < 0.12) {
+                const rollEvent = Math.random();
+                const ticker = document.getElementById('market-ticker');
+                const box = document.getElementById('game-status');
+                
+                box.classList.add('status-flash');
+                ticker.style.color = "#f59e0b";
+
+                if (rollEvent < 0.33) {
+                    activeEvent = { target: 'pizza', mult: 4.0, desc: "🚨 PIZZA SHORTAGE! Restaurants buying cargo at 4x VALUE!" };
+                } else if (rollEvent < 0.66) {
+                    activeEvent = { target: 'caviar', mult: 0.1, desc: "📉 CRYPTO CRASH! Black Caviar market values tanked by 90%!" };
+                } else {
+                    activeEvent = { target: 'sushi', mult: 2.5, desc: "🍣 UNSTABLE DEMAND! Cyber Fusion Sushi premiums spiked 2.5x!" };
+                }
+
+                box.textContent = `[ALERT] ${activeEvent.desc}`;
+                ticker.textContent = `⚠️ MARKET EVENT: ${activeEvent.desc.substring(0, 30)}...`;
+
+                eventTimeout = setTimeout(() => {
+                    activeEvent = null;
+                    box.classList.remove('status-flash');
+                    ticker.style.color = "#cbd5e1";
+                    ticker.textContent = "⚡ Volatility Engine Active: Prices change every 7s";
+                    box.textContent = "Market normalization engine complete.";
+                }, 18000); // Event lifespan vector
+            }
+
+            // 3. Process Cargo Bay Food Spoil Mutation Check (4% chance checking inventory array)
+            keys.forEach(key => {
+                if (inventory[key] > 0 && Math.random() < 0.04) {
+                    inventory[key]--;
+                    inventory.spoiled++;
+                    gameStatus.textContent = `🤢 A unit of ${key} spoiled inside cargo space!`;
+                }
+            });
+
             updateUI();
         }, 7000);
 
@@ -524,17 +660,23 @@
             document.getElementById('inv-icecream').textContent = inventory.icecream;
             document.getElementById('inv-sushi').textContent = inventory.sushi;
             document.getElementById('inv-caviar').textContent = inventory.caviar;
-            document.getElementById('price-pizza').textContent = `$${marketPrices.pizza}`;
-            document.getElementById('price-milk').textContent = `$${marketPrices.milk}`;
-            document.getElementById('price-icecream').textContent = `$${marketPrices.icecream}`;
-            document.getElementById('price-sushi').textContent = `$${marketPrices.sushi}`;
-            document.getElementById('price-caviar').textContent = `$${marketPrices.caviar}`;
+            document.getElementById('inv-spoiled').textContent = inventory.spoiled;
+
+            // Apply conditional formatting based on active flash modifiers
+            ['pizza', 'milk', 'icecream', 'sushi', 'caviar'].forEach(key => {
+                const el = document.getElementById(`price-${key}`);
+                if (activeEvent && activeEvent.target === key) {
+                    el.textContent = `$${Math.floor(marketPrices[key] * activeEvent.mult)}!!`;
+                    el.style.color = activeEvent.mult > 1 ? "#f59e0b" : "#ef4444";
+                } else {
+                    el.textContent = `$${marketPrices[key]}`;
+                    el.style.color = "#10b981";
+                }
+            });
             
             if (playerUsername && playerCoins > dbHighScore) {
                 dbHighScore = playerCoins; 
-                try {
-                    await db.from('Leaderboard').upsert({ username: playerUsername, high_score: dbHighScore }, { onConflict: 'username' });
-                } catch (e) { console.warn(e); }
+                try { await db.from('Leaderboard').upsert({ username: playerUsername, high_score: dbHighScore }, { onConflict: 'username' }); } catch (e) {}
             }
         }
 
@@ -548,7 +690,7 @@
                     let prefix = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : "";
                     listElement.innerHTML += `<li><span>${prefix}${p.username}</span><strong>$${p.high_score}</strong></li>`;
                 });
-            } catch (err) { console.error(err); }
+            } catch (err) {}
         }
         setInterval(fetchLeaderboard, 10000);
     </script>
