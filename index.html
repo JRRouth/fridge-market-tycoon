@@ -348,6 +348,7 @@
             <h2>UPGRADES</h2>
             <button id="upgrade-btn" class="btn-upgrade" onclick="purchaseFridgeUpgrade()">Buy Tier 2 Smart Fridge ($150)</button>
             <button id="drone-btn" class="btn-drone" onclick="purchaseDrone()">Deploy Auto-Extraction Drone ($300)</button>
+            <button id="drone-upgrade-btn" class="btn-upgrade" style="background: linear-gradient(135deg, #0284c7, #0369a1); display: none; margin-top: 8px;" onclick="upgradeDroneSpeed()">Tune Drone Thrusters ($600)</button>
         </div>
 
     </div>
@@ -362,12 +363,17 @@
         let dbHighScore = 0; 
         let currentFridgeTier = 1;
         let playerUsername = "";
+        
+        // Advanced Drone Infrastructure State
         let hasDrone = false;
+        let droneLevel = 1;
+        let droneIntervalId = null;
+        const droneSpeeds = { 1: 5000, 2: 3000, 3: 1500 };
+        const droneUpgradeCosts = { 1: 600, 2: 1200, 3: null };
 
         let inventory = { pizza: 0, milk: 0, icecream: 0, sushi: 0, caviar: 0, spoiled: 0 };
         let marketPrices = { pizza: 10, milk: 5, icecream: 25, sushi: 55, caviar: 100 };
         
-        // Flash event multiplier maps
         let activeEvent = null; 
         let eventTimeout = null;
 
@@ -393,6 +399,27 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // Local Patcher Hook: Automatically sync legacy local saves with drone architecture
+            if (localStorage.getItem('fridge_tycoon_has_drone') === 'true') {
+                hasDrone = true;
+                droneLevel = parseInt(localStorage.getItem('fridge_tycoon_drone_level')) || 1;
+                
+                const droneBtn = document.getElementById('drone-btn');
+                droneBtn.textContent = `DRONE ONLINE (LVL ${droneLevel})`;
+                droneBtn.style.background = "#334155";
+                droneBtn.style.boxShadow = "none";
+                
+                const upBtn = document.getElementById('drone-upgrade-btn');
+                upBtn.style.display = "block";
+                if (droneUpgradeCosts[droneLevel] === null) {
+                    upBtn.textContent = "DRONE SPEED AT MAXIMUM SPEC";
+                    upBtn.style.background = "#334155";
+                } else {
+                    upBtn.textContent = `Tune Drone Thrusters ($${droneUpgradeCosts[droneLevel]})`;
+                }
+                startDroneLoop();
+            }
+
             const savedName = localStorage.getItem('fridge_tycoon_username');
             if (savedName) {
                 playerUsername = savedName;
@@ -439,6 +466,8 @@
             gameStatus.textContent = "Purging server row memory addresses...";
             try { await db.from('Leaderboard').delete().eq('username', playerUsername); } catch (err) {}
             localStorage.removeItem('fridge_tycoon_username');
+            localStorage.removeItem('fridge_tycoon_has_drone');
+            localStorage.removeItem('fridge_tycoon_drone_level');
             location.reload(); 
         }
 
@@ -493,7 +522,6 @@
                 inventory[itemKey]--;
                 let payout = marketPrices[itemKey];
                 
-                // Process macro flash event multiplier vectors
                 if (activeEvent && activeEvent.target === itemKey) {
                     payout = Math.floor(payout * activeEvent.mult);
                 }
@@ -534,10 +562,15 @@
             if (playerCoins >= 300) {
                 playerCoins -= 300;
                 hasDrone = true;
+                localStorage.setItem('fridge_tycoon_has_drone', 'true');
+                localStorage.setItem('fridge_tycoon_drone_level', '1');
+                
                 const droneBtn = document.getElementById('drone-btn');
-                droneBtn.textContent = "DRONE ONLINE & EXTRACTING";
+                droneBtn.textContent = "DRONE ONLINE (LVL 1)";
                 droneBtn.style.background = "#334155";
                 droneBtn.style.boxShadow = "none";
+                
+                document.getElementById('drone-upgrade-btn').style.display = "block";
                 updateUI();
                 gameStatus.textContent = "🛸 Extraction Drone deployed. Gathering passive loops...";
                 startDroneLoop();
@@ -545,11 +578,37 @@
         }
 
         function startDroneLoop() {
-            setInterval(() => {
+            if (droneIntervalId) clearInterval(droneIntervalId);
+            let currentSpeed = droneSpeeds[droneLevel];
+            droneIntervalId = setInterval(() => {
                 if (hasDrone) {
                     determineLoot(true);
                 }
-            }, 5000);
+            }, currentSpeed);
+        }
+
+        function upgradeDroneSpeed() {
+            let nextCost = droneUpgradeCosts[droneLevel];
+            if (nextCost === null) return;
+            
+            if (playerCoins >= nextCost) {
+                playerCoins -= nextCost;
+                droneLevel++;
+                localStorage.setItem('fridge_tycoon_drone_level', droneLevel.toString());
+                
+                document.getElementById('drone-btn').textContent = `DRONE ONLINE (LVL ${droneLevel})`;
+                startDroneLoop();
+                
+                const upBtn = document.getElementById('drone-upgrade-btn');
+                if (droneUpgradeCosts[droneLevel] === null) {
+                    upBtn.textContent = "DRONE SPEED AT MAXIMUM SPEC";
+                    upBtn.style.background = "#334155";
+                } else {
+                    upBtn.textContent = `Tune Drone Thrusters ($${droneUpgradeCosts[droneLevel]})`;
+                }
+                updateUI();
+                gameStatus.textContent = `⚡ Drone upgraded to Level ${droneLevel}! Harvest speed: ${droneSpeeds[droneLevel]/1000}s`;
+            } else { gameStatus.textContent = `❌ Insufficient credits! Speed tuning requires $${nextCost}.`; }
         }
 
         function triggerEscrowHack() {
@@ -579,11 +638,9 @@
             } else { gameStatus.textContent = "❌ Missing funds for bio-sanitization."; }
         }
 
-        // Master 7-Second Market Volatility + Flash + Expiry Engine
         setInterval(function() {
             const keys = ['pizza', 'milk', 'icecream', 'sushi', 'caviar'];
             
-            // 1. Process Trend Arrows and Pricing Volatility
             keys.forEach(key => {
                 let currentPrice = marketPrices[key];
                 let delta = 0;
@@ -612,7 +669,6 @@
                 marketPrices[key] = nextPrice;
             });
 
-            // 2. Process Rare Flash Market Macro Events (12% chance every tick)
             if (!activeEvent && Math.random() < 0.12) {
                 const rollEvent = Math.random();
                 const ticker = document.getElementById('market-ticker');
@@ -638,10 +694,9 @@
                     ticker.style.color = "#cbd5e1";
                     ticker.textContent = "⚡ Volatility Engine Active: Prices change every 7s";
                     box.textContent = "Market normalization engine complete.";
-                }, 18000); // Event lifespan vector
+                }, 18000);
             }
 
-            // 3. Process Cargo Bay Food Spoil Mutation Check (4% chance checking inventory array)
             keys.forEach(key => {
                 if (inventory[key] > 0 && Math.random() < 0.04) {
                     inventory[key]--;
@@ -662,7 +717,6 @@
             document.getElementById('inv-caviar').textContent = inventory.caviar;
             document.getElementById('inv-spoiled').textContent = inventory.spoiled;
 
-            // Apply conditional formatting based on active flash modifiers
             ['pizza', 'milk', 'icecream', 'sushi', 'caviar'].forEach(key => {
                 const el = document.getElementById(`price-${key}`);
                 if (activeEvent && activeEvent.target === key) {
