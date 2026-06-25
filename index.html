@@ -193,7 +193,6 @@
         }
         .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5); }
 
-        /* --- INTERACTIVE LEADERBOARD STYLING TWEAKS --- */
         .leaderboard-box { 
             background: #111827; 
             padding: 15px; 
@@ -260,6 +259,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+    <audio id="bg-music" loop src="bg-music.mp3"></audio>
 
     <div id="username-modal" class="modal-overlay">
         <div class="modal-content">
@@ -353,11 +354,9 @@
         let currentFridgeTier = 1;
         let playerUsername = "";
 
-        // Expanded Inventory & Prices Data Frames
         let inventory = { pizza: 0, milk: 0, icecream: 0, sushi: 0, caviar: 0 };
         let marketPrices = { pizza: 10, milk: 5, icecream: 25, sushi: 55, caviar: 100 };
 
-        // Optimized algorithmic reward configuration matrix across 6 structural hardware tiers
         const fridgeTiers = {
             1: { name: "Rusty Mini-Fridge", upgradeCost: 150, pizzaChance: 0.65, milkChance: 0.30, icecreamChance: 0.05, sushiChance: 0.00, caviarChance: 0.00 },
             2: { name: "Electric Smart Fridge", upgradeCost: 400, pizzaChance: 0.45, milkChance: 0.35, icecreamChance: 0.15, sushiChance: 0.05, caviarChance: 0.00 },
@@ -377,6 +376,11 @@
                 playerUsername = savedName;
                 document.getElementById('username-modal').style.display = 'none';
                 gameStatus.textContent = "Connecting to high score records...";
+                
+                const track = document.getElementById('bg-music');
+                track.volume = 0.15;
+                track.play().catch(() => console.log("Music standby: awaiting interaction."));
+
                 try {
                     const { data } = await db.from('Leaderboard').select('high_score').eq('username', playerUsername).maybeSingle();
                     if (data) dbHighScore = data.high_score;
@@ -391,6 +395,11 @@
         document.getElementById('save-username-btn').addEventListener('click', async () => {
             const nameInput = document.getElementById('username-input').value.trim();
             if (nameInput.length < 3) { alert("Username must be at least 3 characters!"); return; }
+            
+            const track = document.getElementById('bg-music');
+            track.volume = 0.15;
+            track.play().catch(e => console.warn(e));
+
             playerUsername = nameInput;
             localStorage.setItem('fridge_tycoon_username', playerUsername);
             document.getElementById('username-modal').style.display = 'none';
@@ -408,7 +417,6 @@
             setTimeout(fetchLeaderboard, 500);
         });
 
-        // --- HARDWARE MEMORY OPTIMIZATION PURGE LOOP ---
         async function purgeAndChangeName() {
             if (!playerUsername) return;
             const confirmPurge = confirm(`🚨 WARN: Changing your tag will permanently DELETE "${playerUsername}" from the database scoreboard! Continue?`);
@@ -416,7 +424,6 @@
 
             gameStatus.textContent = "Purging server row memory addresses...";
             try {
-                // Instantly vaporizes the row configuration frame from Supabase to preserve database spaces completely
                 await db.from('Leaderboard').delete().eq('username', playerUsername);
             } catch (err) {
                 console.warn("Database storage row bypass drop structural frame:", err);
@@ -428,8 +435,8 @@
 
         fridge.addEventListener('click', function() {
             if (fridge.classList.contains('open')) {
-                fridge.classList.remove('remove');
                 fridge.classList.remove('open');
+                fridge.classList.remove('remove');
                 gameStatus.textContent = "Fridge closed. Scanner idle.";
                 setTimeout(() => { foodDisplay.textContent = "❓"; }, 500);
             } else {
@@ -446,7 +453,6 @@
             foodDisplay.style.transform = "scale(0.5)";
             
             setTimeout(() => {
-                // Tier Cumulative Random Roll Assignment Loops
                 if (roll < c.caviarChance) {
                     inventory.caviar++; foodDisplay.textContent = "👑"; gameStatus.textContent = "💎 EXOTIC ASSET OUTLET! Found Black Caviar!";
                 } else if (roll < c.caviarChance + c.sushiChance) {
@@ -496,7 +502,6 @@
             } else { gameStatus.textContent = `❌ Missing funds! Requires $${cost}.`; }
         }
 
-        // --- VOLATILITY MARKETING ENGINE ---
         setInterval(function() {
             marketPrices.pizza = Math.max(3, marketPrices.pizza + (Math.floor(Math.random() * 9) - 4));
             marketPrices.milk = Math.max(1, marketPrices.milk + (Math.floor(Math.random() * 5) - 2));
