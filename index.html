@@ -465,9 +465,12 @@
 
             gameStatus.textContent = "Purging server row memory addresses...";
             try { await db.from('Leaderboard').delete().eq('username', playerUsername); } catch (err) {}
+            
+            // Wipes the drone infrastructure completely from the browser cache
             localStorage.removeItem('fridge_tycoon_username');
             localStorage.removeItem('fridge_tycoon_has_drone');
             localStorage.removeItem('fridge_tycoon_drone_level');
+            
             location.reload(); 
         }
 
